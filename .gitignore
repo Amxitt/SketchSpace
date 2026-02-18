@@ -26,6 +26,7 @@ i
 .next/
 out/
 build
+dist
 dist.*
 
 
