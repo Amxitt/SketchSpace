@@ -25,6 +25,7 @@ function checkUser(token) {
     }
 }
 wss.on('connection', function connection(ws, request) {
+    console.log("new ws connection");
     const url = request.url;
     if (!url)
         return;
@@ -40,28 +41,47 @@ wss.on('connection', function connection(ws, request) {
         rooms: [],
         ws
     });
+    console.log("new ws connection");
     ws.on('message', async function message(data) {
         const parsedData = JSON.parse(data);
         if (parsedData.type === "join_room") {
+            try {
+                await db_1.prisma.room.create({
+                    data: {
+                        slug: parsedData.roomId,
+                        adminId: userId
+                    }
+                });
+            }
+            catch (e) {
+                console.log("cannot create room");
+            }
             const user = users.find(x => x.ws === ws);
             user?.rooms.push(parsedData.roomId);
+            console.log("Joining room: ", parsedData.roomId);
+            console.log(users);
         }
         if (parsedData.type === "leave_room") {
             const user = users.find(x => x.ws === ws);
             if (!user)
                 return;
-            user.rooms = user?.rooms.filter(x => x === parsedData.room);
+            user.rooms = user?.rooms.filter(x => x !== parsedData.room);
         }
         if (parsedData.type === "chat") {
             const roomId = parsedData.roomId;
             const message = parsedData.message;
-            await db_1.prisma.chat.create({
-                data: {
-                    roomId,
-                    message,
-                    userId
-                }
-            });
+            try {
+                await db_1.prisma.chat.create({
+                    data: {
+                        roomId,
+                        message,
+                        userId
+                    }
+                });
+            }
+            catch (e) {
+                console.log(e);
+            }
             users.forEach(user => {
                 if (user.rooms.includes(roomId)) {
                     user.ws.send(JSON.stringify({

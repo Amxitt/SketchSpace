@@ -100,20 +100,48 @@ app.post("/room", auth, async (req, res)=>{
      if(!req.userId) return res.json({message: "not authorized"});
 
      try{
-        await prisma.room.create({
+        const room = await prisma.room.create({
             data: {
                 slug: name,
                 adminId: req.userId
             }
         })
 
-        res.json({message: "room created as" + name});
+        res.json({roomId: room.id});
      }catch(e){
-        res.json({message: "error while creating room"})
+        res.json({message: "error while creating room"});
+        console.log(e);
      }
 })
 
+app.get("/chats/:roomId", auth,  async (req, res)=>{
+    const roomId = Number(req.params.roomId);
+    const messages = await prisma.chat.findMany({
+        where: {
+            roomId
+        },
+        orderBy: {
+            id: "desc"
+        },
+        take: 50
+    })
 
+    console.log(messages);
+    res.json({messages})
+})
+
+app.get("/room/:slug", async (req, res)=>{
+    const slug = req.params.slug;
+    const room = await prisma.room.findFirst({
+        where: {
+            slug
+        }
+    })
+
+    res.json({
+        room
+    })
+})
 app.listen(4000, ()=>{
     console.log("running http")
 })

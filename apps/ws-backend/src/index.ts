@@ -2,6 +2,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { prisma } from "@repo/db";
+import e from "express";
 
 const wss = new WebSocketServer({port: 8080});
 
@@ -32,6 +33,7 @@ function checkUser(token: string): string | null{
 }
 
 wss.on('connection', function connection(ws, request){
+       console.log("new ws connection");
     const url = request.url;
     if(!url) return;
 
@@ -49,25 +51,39 @@ wss.on('connection', function connection(ws, request){
         rooms: [],
         ws
     })
+    console.log("new ws connection");
 
     ws.on('message', async function message(data){
         const parsedData = JSON.parse(data as unknown as string);
 
         if(parsedData.type === "join_room"){
+        try{
+            await prisma.room.create({
+                data: {
+                    slug: parsedData.roomId,
+                    adminId: userId
+                }
+            })
+        }catch(e){
+            console.log("cannot create room");
+        }
             const user = users.find(x => x.ws === ws);
             user?.rooms.push(parsedData.roomId);
+            console.log("Joining room: ", parsedData.roomId)
+            console.log(users);
         }
 
         if(parsedData.type === "leave_room"){
             const user = users.find(x => x.ws === ws);
             if(!user) return;
-            user.rooms = user?.rooms.filter(x => x === parsedData.room)
+            user.rooms = user?.rooms.filter(x => x !== parsedData.room)
         }
 
         if(parsedData.type === "chat"){
             const roomId = parsedData.roomId;
             const message = parsedData.message;
             try{
+                
             await prisma.chat.create({
                 data: {
                     roomId,
@@ -76,7 +92,7 @@ wss.on('connection', function connection(ws, request){
                 }
             })            
             }catch(e){
-                return ;
+                console.log(e) ;
             }
             users.forEach(user => {
                 if(user.rooms.includes(roomId)){
