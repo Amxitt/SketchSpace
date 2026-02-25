@@ -28,6 +28,8 @@ out/
 build
 dist
 dist.*
+**/dist/
+**/dist/**
 
 
 # Debug

@@ -73,7 +73,7 @@ wss.on('connection', function connection(ws, request) {
             try {
                 await db_1.prisma.chat.create({
                     data: {
-                        roomId,
+                        roomId: Number(roomId),
                         message,
                         userId
                     }

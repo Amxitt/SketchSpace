@@ -10,8 +10,10 @@ const config_1 = require("@repo/backend-common/config");
 const types_1 = require("@repo/common/types");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const db_1 = require("@repo/db");
+const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+app.use((0, cors_1.default)());
 app.post("/signup", async (req, res) => {
     const parsedData = types_1.CreateUserSchema.safeParse(req.body);
     if (!parsedData.success) {
@@ -105,15 +107,31 @@ app.post("/room", auth_1.auth, async (req, res) => {
         console.log(e);
     }
 });
-app.get("/chats/:roomId", auth_1.auth, async (req, res) => {
+app.get("/chats/:roomId", async (req, res) => {
+    console.log("yes frontend interacted");
     const roomId = Number(req.params.roomId);
     const messages = await db_1.prisma.chat.findMany({
         where: {
             roomId
-        }
+        },
+        orderBy: {
+            id: "desc"
+        },
+        take: 50
     });
     console.log(messages);
-    res.json({ message: messages });
+    res.json({ messages });
+});
+app.get("/room/:slug", async (req, res) => {
+    const slug = req.params.slug;
+    const room = await db_1.prisma.room.findFirst({
+        where: {
+            slug
+        }
+    });
+    res.json({
+        room
+    });
 });
 app.listen(4000, () => {
     console.log("running http");
