@@ -1,34 +1,79 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
-import { initDraw } from "../draw-logic";
-import { WS_URL } from "../config";
+import { initDraw } from "../draw-2";
+import IconButton from "../icons/icons";
+import { CircleIcon, PenIcon, RectangleHorizontal, RectangleHorizontalIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-export function Canvas({roomId}: {roomId: string}){
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [socket, setSocket] = useState<WebSocket | null>(null); //weird line is generics do learn about them.
+type Shape =  "Pen" | "Circle" | "Rectangle";
 
-    useEffect(()=>{ //to connect to ws
-        const ws = new WebSocket(WS_URL);
-        ws.onopen = ()=>{
-            setSocket(ws);
-        }
-    },[]);
+export function Canvas({roomId, socket}:{roomId: string, socket: WebSocket}){
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [Tool , setTool] = useState<Shape>("Rectangle");
+ 
 
-    useEffect(()=>{
+
+      useEffect(()=>{
         if(canvasRef.current){
-            const canvas = canvasRef.current;
-            
-            initDraw(canvas, roomId);
+            initDraw(canvasRef.current, roomId, socket);
         }
-    }, [canvasRef])
+          
+    },[canvasRef])
 
-    if(!socket){
-        return <div>
-            Connecting to Server...
+   
+    return <div className="h-screen overflow-hidden">
+        <div style={{
+            position: "absolute",
+            top:10,
+            left: 10
+        }}>
+             <TopBar Tool={Tool} SetTool={setTool} socket={socket} roomId={roomId}/>
         </div>
-    }
-    return <div >
-        <canvas className="border" ref={canvasRef} width={2000} height={2000}></canvas>
+           
+        <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight}></canvas>
     </div>
+}
+
+
+function TopBar({Tool, SetTool, socket, roomId}:{
+    Tool: Shape,
+    SetTool: (s: Shape)=>void,
+    socket: WebSocket,
+    roomId: string
+}){
+    const router = useRouter()
+
+     function leaveRoom(){
+        socket.send(JSON.stringify({
+            type: "leave_room",
+            roomId: roomId
+        }))
+        
+        router.push("/dashboard")
+
+//  socket.send(JSON.stringify({
+//             type: "chat",
+//             message: JSON.stringify({
+//                 shape
+//             }),
+//             roomId: roomId
+//         }))
+
+    }
+
+
+    return <div className="w-full items-center flex justify-between">
+            <div className="bg-black text-white flex gap-1">
+                <IconButton icon= {<PenIcon/>} onClick={()=>{SetTool("Pen")}} activated= {Tool ==="Pen"}/>
+                <IconButton icon= {<CircleIcon/>} onClick={()=>{SetTool("Circle")}} activated= {Tool ==="Circle"}/>
+                <IconButton icon= {<RectangleHorizontalIcon/>} onClick={()=>{SetTool("Rectangle")}} activated= {Tool ==="Rectangle"}/>
+        </div>
+
+        <div className="fixed right-5 ">
+            <div onClick={leaveRoom}   className={`flex h-fit w-24 cursor-pointer justify-center p-2 rounded-md text-white 
+                bg-red-700 `}>
+              Leave
+            </div>
+        </div>
+    </div>
+     
 }

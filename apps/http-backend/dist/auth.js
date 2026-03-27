@@ -9,15 +9,22 @@ const config_1 = require("@repo/backend-common/config");
 function auth(req, res, next) {
     const token = req.headers["authorization"] ?? "";
     console.log(token);
-    const decoded = jsonwebtoken_1.default.verify(token, config_1.JWT_SECRET);
-    console.log(decoded);
-    if (decoded) {
-        req.userId = decoded.userId;
-        next();
+    try {
+        const decoded = jsonwebtoken_1.default.verify(token, config_1.JWT_SECRET);
+        console.log(decoded);
+        if (decoded) {
+            req.userId = decoded.userId;
+            next();
+        }
+        else {
+            res.status(403).json({
+                message: "Unauthorized"
+            });
+        }
     }
-    else {
-        res.status(403).json({
-            message: "Unauthorized"
+    catch (e) {
+        res.json({
+            message: "auth failed"
         });
     }
 }

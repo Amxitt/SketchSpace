@@ -68,6 +68,7 @@ app.post("/signin", async (req, res) => {
         const token = jsonwebtoken_1.default.sign({ userId: user?.id }, config_1.JWT_SECRET);
         res.json({
             token,
+            username,
             message: "You are signed up"
         });
     }
@@ -91,8 +92,10 @@ app.post("/room", auth_1.auth, async (req, res) => {
     if (room) {
         return res.json({ message: "room already exists change the room name" });
     }
-    if (!req.userId)
+    if (!req.userId) {
+        console.log("here not working" + req.userId);
         return res.json({ message: "not authorized" });
+    }
     try {
         const room = await db_1.prisma.room.create({
             data: {
@@ -107,31 +110,88 @@ app.post("/room", auth_1.auth, async (req, res) => {
         console.log(e);
     }
 });
-app.get("/chats/:roomId", async (req, res) => {
+app.get("/chats/:roomId", auth_1.auth, async (req, res) => {
     console.log("yes frontend interacted");
-    const roomId = Number(req.params.roomId);
-    const messages = await db_1.prisma.chat.findMany({
-        where: {
-            roomId
-        },
-        orderBy: {
-            id: "desc"
-        },
-        take: 50
-    });
-    console.log(messages);
-    res.json({ messages });
+    try {
+        const roomId = Number(req.params.roomId);
+        const messages = await db_1.prisma.chat.findMany({
+            where: {
+                roomId
+            },
+            orderBy: {
+                id: "desc"
+            },
+            take: 50
+        });
+        console.log(messages);
+        res.json({ messages });
+    }
+    catch (e) {
+        const messages = {
+            "id": 176,
+            "roomId": 2,
+            "message": "{\"shape\":{\"type\":\"rect\",\"x\":640,\"y\":391,\"width\":240,\"height\":300}}",
+            "userId": "755f39a4-bb6e-4cad-9eb1-5dbbc15ecd1f"
+        };
+        console.log("backend got fucked");
+        res.json({ messages });
+    }
 });
 app.get("/room/:slug", async (req, res) => {
     const slug = req.params.slug;
+    if (typeof slug !== "string") {
+        return res.status(400).json({ error: "Invalid slug" });
+    }
     const room = await db_1.prisma.room.findFirst({
         where: {
             slug
         }
     });
+    const id = room?.id;
     res.json({
-        room
+        id
     });
+});
+app.get("/my-rooms", auth_1.auth, async (req, res) => {
+    const rooms = await db_1.prisma.room.findMany({
+        where: {
+            adminId: req.userId
+        }
+    });
+    console.log(rooms);
+    res.status(201).json({
+        rooms
+    });
+});
+app.delete("/remove/:slug", auth_1.auth, async (req, res) => {
+    const slug = req.params.slug;
+    if (typeof slug !== "string") {
+        return res.status(400).json({ error: "Invalid slug" });
+    }
+    try {
+        await db_1.prisma.$transaction([
+            db_1.prisma.chat.deleteMany({
+                where: {
+                    room: {
+                        slug,
+                        adminId: req.userId
+                    }
+                }
+            }),
+            db_1.prisma.room.delete({
+                where: {
+                    slug,
+                    adminId: req.userId
+                }
+            })
+        ]);
+        res.status(200).json({ message: "Room removed successfully" });
+    }
+    catch (e) {
+        res.status(502).json({
+            message: "error while deleting"
+        });
+    }
 });
 app.listen(4000, () => {
     console.log("running http");
