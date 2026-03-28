@@ -21,13 +21,13 @@ export default function CreateRoomModal({Open, setOpen, onSubmit}: {
             top-0 left-0 ">
                 <div className="w-72 h-48 p-4 bg-white flex flex-col 
                 rounded-md
-                justify-center items-center gap-2">
-                    <div onClick={()=> setOpen(false)} className="flex justify-end cursor-pointer">
+                justify-center items-center gap-2 relative">
+                    <div onClick={()=> setOpen(false)} className="absolute top-3 right-3 cursor-pointer active:scale-95">
                         <CrossIcon size= {"md"} />
                     </div>
                 <div>
                         <Input placeholder={"Room Name"} type="text" onChange={(e:any)=>{SetRoomName(e.target.value)}} />
-                        <div onClick={()=>{
+                        <div className="pl-4 pt-2" onClick={()=>{
                             onSubmit(RoomName, setOpen)
                             }}> 
                              <Button text="Create" />

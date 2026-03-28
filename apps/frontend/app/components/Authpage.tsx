@@ -21,7 +21,7 @@ export function AuthPage({isSignin, onSubmit}: {
             <div onClick={()=>{
                     onSubmit({username, password})
                 }} className="flex mt-2 justify-center bg-black p-2 rounded-md
-            text-white">
+            text-white cursor-pointer active:scale-95">
         
                     {isSignin? "Sign in": "Sign up"}
               

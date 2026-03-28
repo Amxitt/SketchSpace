@@ -16,7 +16,7 @@ export default function Home() {
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/signup">
-                <Button className='border px-6 py-2 rounded-md border-gray-400 shadow shadow-gray-400'>Get Started</Button>
+                <Button className='border px-6 py-2 rounded-md border-gray-400 shadow shadow-gray-400 cursor-pointer active:scale-95'>Get Started</Button>
               </Link>
             </div>
           </div>
@@ -38,12 +38,12 @@ export default function Home() {
             </p>
             <div className="flex justify-center gap-4">
               <Link href="/signup">
-                <Button size="lg" className="text-lg px-8 text-white bg-black hover:bg-gray-800 rounded-md">
+                <Button size="lg" className="cursor-pointer active:scale-95 text-lg px-8 text-white bg-black  rounded-md">
                   Start Drawing <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link href="/signin">
-                <Button size="lg" variant="outline" className="text-lg py-2.5 px-8 border border-gray-400 shadow shadow-graw-400 rounded-md">
+                <Button size="lg" variant="outline" className="cursor-pointer active:scale-95 text-lg py-2.5 px-8 border border-gray-400 shadow shadow-graw-400 rounded-md">
                   Sign In
                 </Button>
               </Link>
@@ -100,7 +100,7 @@ export default function Home() {
               Join SketchSpace today and experience the future of collaborative drawing.
             </p>
             <Link href="/signup">
-              <Button size="lg" className="text-lg px-8 border text-white bg-black rounded-md ">
+              <Button size="lg" className="cursor-pointer active:scale-95 text-lg px-8 border text-white bg-black rounded-md ">
                 Create Your Account
               </Button>
             </Link>

@@ -31,11 +31,11 @@ export default function JoinRoomModal({Open, setOpen}: {
         top-0 left-0 ">
             <div className="w-72 h-48 p-4 bg-white flex flex-col 
             rounded-md
-            justify-center items-center gap-2">
-                <div onClick={()=> setOpen(false)} className="flex justify-end cursor-pointer">
+            justify-center items-center gap-2 relative">
+                <div onClick={()=> setOpen(false)} className="absolute top-3 right-3 cursor-pointer active:scale-95">
                     <CrossIcon size= {"md"} />
                 </div>
-            <div>
+            <div className="flex flex-col gap-3 items-center">
                     <Input placeholder={"Room Name"} type="text" onChange={(e)=>{setSlug(e.target.value)}} />
                     <Button text="Join" onClick={action}/>
 

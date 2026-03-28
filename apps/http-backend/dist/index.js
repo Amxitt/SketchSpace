@@ -90,7 +90,7 @@ app.post("/room", auth_1.auth, async (req, res) => {
         }
     });
     if (room) {
-        return res.json({ message: "room already exists change the room name" });
+        return res.status(500).json({ message: "room already exists change the room name" });
     }
     if (!req.userId) {
         console.log("here not working" + req.userId);
@@ -142,26 +142,40 @@ app.get("/room/:slug", async (req, res) => {
     if (typeof slug !== "string") {
         return res.status(400).json({ error: "Invalid slug" });
     }
-    const room = await db_1.prisma.room.findFirst({
-        where: {
-            slug
-        }
-    });
-    const id = room?.id;
-    res.json({
-        id
-    });
+    try {
+        const room = await db_1.prisma.room.findFirst({
+            where: {
+                slug
+            }
+        });
+        const id = room?.id;
+        res.json({
+            id
+        });
+    }
+    catch (e) {
+        res.status(500).json({
+            message: "room doesn't exists"
+        });
+    }
 });
 app.get("/my-rooms", auth_1.auth, async (req, res) => {
-    const rooms = await db_1.prisma.room.findMany({
-        where: {
-            adminId: req.userId
-        }
-    });
-    console.log(rooms);
-    res.status(201).json({
-        rooms
-    });
+    try {
+        const rooms = await db_1.prisma.room.findMany({
+            where: {
+                adminId: req.userId
+            }
+        });
+        console.log(rooms);
+        res.status(201).json({
+            rooms
+        });
+    }
+    catch (e) {
+        res.status(500).json({
+            message: "no room exists with this id"
+        });
+    }
 });
 app.delete("/remove/:slug", auth_1.auth, async (req, res) => {
     const slug = req.params.slug;
