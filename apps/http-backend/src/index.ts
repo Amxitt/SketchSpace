@@ -9,7 +9,12 @@ import cors from "cors";
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: [
+        "http://sketchspace.13.206.68.125.nip.io",
+        "http://localhost:5000"
+    ]
+}));
 
 
 app.post("/signup", async (req, res)=>{
