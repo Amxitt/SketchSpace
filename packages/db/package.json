@@ -6,6 +6,9 @@
   "files": [
     "dist"
   ],
+  "scripts": {
+  "build": "tsc -b"
+},
   "dependencies": {
     "@prisma/client": "6.19.0",
     "dotenv": "^17.3.1"

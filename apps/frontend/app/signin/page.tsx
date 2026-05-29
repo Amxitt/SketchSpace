@@ -17,7 +17,11 @@ export default function Signin(){
     async function handleSubmit({username, password}: UserInfoType){
        try{
         const res = await signin({username, password}) //api call for signin
-        
+        if(res.data.token === undefined) {
+            alert(res.data.message)
+            return
+        }
+
         localStorage.setItem("token", res.data.token)
         localStorage.setItem("name", res.data.username)        
         

@@ -90,7 +90,7 @@ app.post("/room", auth_1.auth, async (req, res) => {
         }
     });
     if (room) {
-        return res.status(500).json({ message: "room already exists change the room name" });
+        return res.status(500).json({ message: "Room already exists change the room name" });
     }
     if (!req.userId) {
         console.log("here not working" + req.userId);

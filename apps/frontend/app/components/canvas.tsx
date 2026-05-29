@@ -70,7 +70,7 @@ function TopBar({Tool, SetTool, socket, roomId}:{
 
         <div className="fixed right-5 ">
             <div onClick={leaveRoom}   className={`flex h-fit w-24 cursor-pointer justify-center p-2 rounded-md text-white 
-                bg-red-700 `}>
+                bg-red-700 active:scale-95 `}>
               Leave
             </div>
         </div>

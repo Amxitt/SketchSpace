@@ -1,2 +1,2 @@
-export const  HTTP_BACKEND = "http://localhost:4000";
-export const WS_URL = "ws://localhost:8080"
+export const  HTTP_BACKEND = "http://api-sketchspace.13.206.68.125.nip.io";
+export const WS_URL = "ws://ws-sketchspace.13.206.68.125.nip.io";
