@@ -21,7 +21,7 @@ jobs:
                source \$NVM_DIR/nvm.sh &&
 
                cd SketchSpace &&
-               git pull &&
+               git pull origin main &&
 
                pnpm install  &&
                pnpm --filter http-backend run build &&
