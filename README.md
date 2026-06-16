@@ -5,6 +5,9 @@ SketchSpace is a real-time collaborative whiteboard application where multiple u
 The project is built using a Turborepo monorepo setup and includes separate HTTP and WebSocket backends for scalable architecture.
 
 ---
+## 🌐 Live Demo
+
+https://sketchspace.13.206.68.125.nip.io
 
 ## 🚀 Features
 

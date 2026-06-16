@@ -25,7 +25,7 @@ export class Game {
 
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
-    private existingShapes: Shape[]
+    private existingShapes: Shape[] 
     private roomId: string;
     private clicked: boolean;
     private startX = 0;
@@ -70,6 +70,7 @@ export class Game {
 
             if (message.type == "chat") {
                 const parsedShape = JSON.parse(message.message)
+                console.log("confirmed", parsedShape.shape);
                 this.existingShapes.push(parsedShape.shape)
                 this.clearCanvas();
             }
@@ -81,7 +82,6 @@ export class Game {
         this.ctx.fillStyle = "rgba(0, 0, 0)"
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-       console.log(this.existingShapes)
         this.existingShapes.map((shape) => {
             console.log(shape);
             if (shape.type === "rect") {
@@ -178,9 +178,11 @@ export class Game {
                     endX: e.clientX,
                     endY: e.clientY
                 }
+                
+
 
                 this.existingShapes.push(shape);
-
+                console.log("sending", shape); //
                 this.socket.send(JSON.stringify({
                     type: "chat",
                     message: JSON.stringify({
