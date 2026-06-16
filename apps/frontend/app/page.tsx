@@ -5,6 +5,7 @@ import { Pencil, Users, Zap, Lock, ArrowRight } from 'lucide-react';
 import { Button } from '@repo/ui/button';
 
 export default function Home() {
+  console.log(process.env.NEXT_PUBLIC_HTTP_BACKEND)
   return (
      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">

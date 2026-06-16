@@ -1,20 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import { initDraw } from "../draw-2";
 import IconButton from "../icons/icons";
-import { CircleIcon, PenIcon, RectangleHorizontal, RectangleHorizontalIcon } from "lucide-react";
+import { CircleIcon, PenIcon, RectangleHorizontalIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Game } from "../draw-2/Game";
 
-type Shape =  "Pen" | "Circle" | "Rectangle";
+export type Tool =  "pen" | "circle" | "rect";
 
 export function Canvas({roomId, socket}:{roomId: string, socket: WebSocket}){
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [Tool , setTool] = useState<Shape>("Rectangle");
+     const [game, setGame] = useState<Game>();
+   const [selectedTool, setSelectedTool] = useState<Tool>("rect");
  
-
+   useEffect(() => {
+    if (game) {
+        game?.setTool(selectedTool);
+    }
+}, [selectedTool, game]);
 
       useEffect(()=>{
         if(canvasRef.current){
-            initDraw(canvasRef.current, roomId, socket);
+          const g = new Game(canvasRef.current, roomId, socket);
+            setGame(g);
+
+            return () => {
+                g.destroy();
+            }
         }
           
     },[canvasRef])
@@ -26,7 +37,7 @@ export function Canvas({roomId, socket}:{roomId: string, socket: WebSocket}){
             top:10,
             left: 10
         }}>
-             <TopBar Tool={Tool} SetTool={setTool} socket={socket} roomId={roomId}/>
+             <TopBar Tool={selectedTool} SetTool={setSelectedTool} socket={socket} roomId={roomId}/>
         </div>
            
         <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight}></canvas>
@@ -35,8 +46,8 @@ export function Canvas({roomId, socket}:{roomId: string, socket: WebSocket}){
 
 
 function TopBar({Tool, SetTool, socket, roomId}:{
-    Tool: Shape,
-    SetTool: (s: Shape)=>void,
+    Tool: Tool,
+    SetTool: (s: Tool)=>void,
     socket: WebSocket,
     roomId: string
 }){
@@ -63,9 +74,9 @@ function TopBar({Tool, SetTool, socket, roomId}:{
 
     return <div className="w-full items-center flex justify-between">
             <div className="bg-black text-white flex gap-1">
-                <IconButton icon= {<PenIcon/>} onClick={()=>{SetTool("Pen")}} activated= {Tool ==="Pen"}/>
-                <IconButton icon= {<CircleIcon/>} onClick={()=>{SetTool("Circle")}} activated= {Tool ==="Circle"}/>
-                <IconButton icon= {<RectangleHorizontalIcon/>} onClick={()=>{SetTool("Rectangle")}} activated= {Tool ==="Rectangle"}/>
+                <IconButton icon= {<PenIcon/>} onClick={()=>{SetTool("pen")}} activated= {Tool ==="pen"}/>
+                <IconButton icon= {<CircleIcon/>} onClick={()=>{SetTool("circle")}} activated= {Tool ==="circle"}/>
+                <IconButton icon= {<RectangleHorizontalIcon/>} onClick={()=>{SetTool("rect")}} activated= {Tool ==="rect"}/>
         </div>
 
         <div className="fixed right-5 ">

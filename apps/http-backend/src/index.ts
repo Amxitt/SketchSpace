@@ -124,7 +124,6 @@ app.post("/room", auth, async (req, res)=>{
 })
 
 app.get("/chats/:roomId", auth,  async (req, res)=>{
-    console.log("yes frontend interacted")
     try{
     const roomId = Number(req.params.roomId);
     const messages = await prisma.chat.findMany({
@@ -134,7 +133,7 @@ app.get("/chats/:roomId", auth,  async (req, res)=>{
         orderBy: {
             id: "desc"  
         },
-        take: 50
+        take: 1000
     })
 
     console.log(messages);

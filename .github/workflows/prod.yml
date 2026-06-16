@@ -1,0 +1,32 @@
+name: Deploy to production
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        name: Deploying on ec2
+        runs-on: ubuntu-latest
+
+        steps:
+         - name: SSH Into the Server
+           run: |
+             echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/ssh_key
+             chmod 600 ~/ssh_key
+
+             ssh -tt -o StrictHostKeyChecking=no -i ~/ssh_key ubuntu@13.206.68.125 "
+               export NVM_DIR=\$HOME/.nvm &&
+               source \$NVM_DIR/nvm.sh &&
+
+               cd SketchSpace &&
+               git pull &&
+
+               pnpm install  &&
+               pnpm --filter http-backend run build &&
+               pnpm --filter ws-backend run build &&
+               pnpm --filter frontend run build &&
+
+               pm2 restart all
+               "
