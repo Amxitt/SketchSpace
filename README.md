@@ -9,7 +9,7 @@ The project is built using a Turborepo monorepo setup and includes separate HTTP
 
 Try SketchSpace here:
 
-https://sketchspace.13.206.68.125.nip.io
+http://sketchspace.13.206.68.125.nip.io
 
 ## 🚀 Features
 
