@@ -5,6 +5,11 @@ SketchSpace is a real-time collaborative whiteboard application where multiple u
 The project is built using a Turborepo monorepo setup and includes separate HTTP and WebSocket backends for scalable architecture.
 
 ---
+## 🌐 Live Demo
+
+Try SketchSpace here:
+
+https://sketchspace.13.206.68.125.nip.io
 
 ## 🚀 Features
 
@@ -14,7 +19,8 @@ The project is built using a Turborepo monorepo setup and includes separate HTTP
 - HTTP backend for authentication and room management
 - WebSocket backend for live drawing synchronization
 - Modular monorepo architecture using Turborepo
-
+- Rectangle, Circle, Freehand pen drawing tool
+- Persistent canvas state
 
 ### Drawing Logic
 
@@ -49,12 +55,19 @@ Backend:
 - WebSocket server
 
 Database:
-- PostgreSQL / MongoDB (based on setup)
+- PostgreSQL (Neon)
+- Prism ORM
 
 Tooling:
 - Turborepo
 - prisma
 - pnpm
+
+
+## Deployment:
+- AWS EC2
+- Nginx reverse proxy
+- GitHub Actions CI/CD
 
 ---
 
