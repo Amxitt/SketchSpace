@@ -15,10 +15,7 @@ type Shape = {
     radius: number;
 } | {
     type: "pen";
-    startX: number;
-    startY: number;
-    endX: number;
-    endY: number;
+   points: {x: number, y: number}[]
 }
 
 export class Game {
@@ -31,7 +28,7 @@ export class Game {
     private startX = 0;
     private startY = 0;
     private selectedTool: Tool = "rect";
-
+    private currentStrokeForPen?: {x: number, y: number}[]
     socket: WebSocket;
 
     constructor(canvas: HTMLCanvasElement, roomId: string, socket: WebSocket) {
@@ -94,11 +91,15 @@ export class Game {
                 this.ctx.closePath();                
             }else if(shape.type === "pen"){
                 this.ctx.strokeStyle = "rgba(255,255,255)";
+
+                for (let i = 0; i < shape.points.length - 1 ; i++){
                 this.ctx.beginPath();
-                this.ctx.moveTo(shape.startX, shape.startY);
-                this.ctx.lineTo(shape.endX, shape.endY);
+                this.ctx.moveTo(shape.points[i].x, shape.points[i].y);
+                this.ctx.lineTo(shape.points[i+1].x, shape.points[i+1].y);
                 this.ctx.stroke();
                 this.ctx.closePath();
+                }
+               
             }
         })
     }
@@ -107,6 +108,10 @@ export class Game {
         this.clicked = true
         this.startX = e.clientX
         this.startY = e.clientY
+
+        if(this.selectedTool === "pen"){
+            this.currentStrokeForPen = [{x: e.clientX, y: e.clientY}]
+        }
     }
     mouseUpHandler = (e: any) => {
         this.clicked = false
@@ -133,7 +138,11 @@ export class Game {
                 centerY: this.startY + radius,
             }
         } else if(selectedTool === "pen"){
-            return;
+            if (this.currentStrokeForPen === undefined) return;
+            shape = {
+                type: "pen",
+                points: this.currentStrokeForPen
+            }
         }
 
         if (!shape) {
@@ -149,6 +158,7 @@ export class Game {
             }),
             roomId: this.roomId
         }))
+        this.currentStrokeForPen = undefined;
     }
     mouseMoveHandler = (e: any) => {
         if (this.clicked) {
@@ -169,35 +179,30 @@ export class Game {
                 this.ctx.stroke();
                 this.ctx.closePath();                
             }
-            else if (selectedTool === "pen") {
+       else if (selectedTool === "pen") {
+        if (!this.currentStrokeForPen) return;
 
-                const shape: Shape = {
-                    type: "pen",
-                    startX: this.startX,
-                    startY: this.startY,
-                    endX: e.clientX,
-                    endY: e.clientY
-                }
-                
-
-
-                this.existingShapes.push(shape);
-                console.log("sending", shape); //
-                this.socket.send(JSON.stringify({
-                    type: "chat",
-                    message: JSON.stringify({
-                        shape
-                    }),
-                    roomId: this.roomId
-                }));
+                this.currentStrokeForPen.push({
+                    x: e.clientX,
+                    y: e.clientY
+                });
 
                 this.ctx.beginPath();
-                this.ctx.moveTo(this.startX, this.startY);
-                this.ctx.lineTo(e.clientX, e.clientY);
-                this.ctx.stroke();
 
-                this.startX = e.clientX;
-                this.startY = e.clientY;
+                this.ctx.moveTo(
+                    this.currentStrokeForPen[0].x,
+                    this.currentStrokeForPen[0].y
+                );
+
+                for (let i = 1; i < this.currentStrokeForPen.length; i++) {
+                    this.ctx.lineTo(
+                        this.currentStrokeForPen[i].x,
+                        this.currentStrokeForPen[i].y
+                    );
+                }
+
+                this.ctx.stroke();
+                this.ctx.closePath();
             }
         }
     }

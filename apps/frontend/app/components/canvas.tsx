@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { initDraw } from "../draw-2";
 import IconButton from "../icons/icons";
 import { CircleIcon, PenIcon, RectangleHorizontalIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Game } from "../draw-2/Game";
+import { Game } from "../draw-logic/Game"
 
 export type Tool =  "pen" | "circle" | "rect";
 
