@@ -67,14 +67,12 @@ wss.on('connection', function connection(ws, request){
         if(parsedData.type === "leave_room"){
             const user = users.find(x => x.ws === ws);
             if(!user) return;
-             user?.rooms.delete(parsedData.roomId)
+             user?.rooms.delete(roomId)
 
              console.log("user just left with id " +  user.userId);
         }
 
         if(parsedData.type === "chat"){
-            console.log("yes came here after shape was created")
-            const roomId = Number(parsedData.roomId);
             const message = parsedData.message;
             try{
                 console.log("room Id is: " + roomId + "message is: "+ message)
@@ -91,7 +89,7 @@ wss.on('connection', function connection(ws, request){
                 console.log(e) ;
             }
             users.forEach(user => {
-                if(user.rooms.has(roomId)){
+                if( user.userId != userId &&user.rooms.has(roomId)){
                     user.ws.send(JSON.stringify({
                         type: "chat",
                         message: message,
